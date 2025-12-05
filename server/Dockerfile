@@ -28,8 +28,7 @@ WORKDIR /app
 # 复制构建好的二进制文件
 COPY --from=builder /app/gofilm .
 
-# 复制配置文件
-COPY config/config.yaml ./config/
+# 配置文件通过环境变量加载，无需复制配置文件
 
 # 设置时区
 ENV TZ=Asia/Shanghai
