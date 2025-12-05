@@ -1,7 +1,6 @@
 package db
 
 import (
-	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -16,22 +15,10 @@ func InitDatabase() (err error) {
 	// client 相关属性设置
 	var dialector gorm.Dialector
 
-	// 根据配置的数据库类型选择不同的驱动
-	switch cfg.Database.Type {
-	case "postgres":
-		dialector = postgres.New(postgres.Config{
-			DSN: cfg.Database.GetDSN(),
-		})
-	default: // 默认使用mysql
-		dialector = mysql.New(mysql.Config{
-			DSN:                       cfg.Database.GetDSN(),
-			DefaultStringSize:         255,   //string类型字段默认长度
-			DisableDatetimePrecision:  true,  // 禁用 datetime 精度
-			DontSupportRenameIndex:    true,  // 重命名索引时采用删除并新建的方式
-			DontSupportRenameColumn:   true,  // 用change 重命名列
-			SkipInitializeWithVersion: false, // 根据当前Mysql版本自动配置
-		})
-	}
+	// 使用PostgreSQL驱动
+	dialector = postgres.New(postgres.Config{
+		DSN: cfg.Database.GetDSN(),
+	})
 
 	Mdb, err = gorm.Open(dialector, &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{

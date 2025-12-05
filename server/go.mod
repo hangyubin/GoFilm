@@ -9,6 +9,7 @@ require (
 	github.com/redis/go-redis/v9 v9.0.2
 	github.com/robfig/cron/v3 v3.0.0
 	gorm.io/driver/mysql v1.4.7
+	gorm.io/driver/postgres v1.5.4
 	gorm.io/gorm v1.25.5
 )
 
