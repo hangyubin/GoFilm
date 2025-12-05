@@ -3,7 +3,6 @@ package db
 import (
 	"context"
 	"github.com/redis/go-redis/v9"
-	"server/config"
 	"time"
 )
 
@@ -17,9 +16,9 @@ var Cxt = context.Background()
 func InitRedisConn() error {
 
 	Rdb = redis.NewClient(&redis.Options{
-		Addr:        config.RedisAddr,
-		Password:    config.RedisPassword,
-		DB:          config.RedisDBNo,
+		Addr:        cfg.Redis.Addr,
+		Password:    cfg.Redis.Password,
+		DB:          cfg.Redis.DB,
 		PoolSize:    10,               // 最大连接数
 		DialTimeout: time.Second * 10, // 超时时间
 	})

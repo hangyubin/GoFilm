@@ -3,72 +3,47 @@ import {
     createWebHistory,
 } from "vue-router";
 
-// 1.定义路由组件
-import IndexHome from "../views/IndexHome.vue";
-import Home from "../views/index/Home.vue";
-import FilmDetails from "../views/index/FilmDetails.vue";
-import Play from "../views/index/Play.vue";
-import SearchFilm from "../views/index/SearchFilm.vue";
-import NotFound from '../views/error/Error404.vue'
-import FilmClassifySearch from "../views/index/FilmClassifySearch.vue";
-import FilmClassify from "../views/index/FilmClassify.vue";
-import ManageIndex from "../views/manage/Index.vue"
-import Login from "../views/Login.vue"
-import ManageHome from "../views/manage/ManageHome.vue";
 import {getToken} from "../utils/token";
-import CollectManage from "../views/manage/collect/CollectManage.vue";
-import SiteConfig from "../views/manage/system/SiteConfig.vue";
-import CronManage from "../views/manage/cron/CronManage.vue";
-import Temp from "../views/manage/file/Temp.vue";
-import FilmClass from "../views/manage/film/FilmClass.vue";
-import Film from "../views/manage/film/Film.vue";
-import FileUpload from "../views/manage/file/FileUpload.vue";
-import FilmAdd from "../views/manage/film/FilmAdd.vue";
-import CustomPlay from "../views/index/CustomPlay.vue";
-import Banners from "../views/manage/system/Banners.vue";
-import FilmHistory from "../views/index/FilmHistory.vue";
-import FailureRecord from "../views/manage/collect/FailureRecord.vue";
-
 
 // 2. 定义一个路由
 const routes = [
     {
         path: '/',
-        component: IndexHome,
+        component: () => import("../views/IndexHome.vue"),
         redirect: '/index',
         children: [
-            {path: 'index', component: Home},
-            {path: 'filmDetail', component: FilmDetails},
-            {path: 'play', component: Play},
-            {path: 'search', component: SearchFilm},
-            {path: 'filmClassify', component: FilmClassify},
-            {path: 'filmClassifySearch', component: FilmClassifySearch},
-            {path: '/custom/player', component: CustomPlay},
-            {path: '/history', component: FilmHistory},
+            {path: 'index', component: () => import("../views/index/Home.vue")},
+            {path: 'filmDetail', component: () => import("../views/index/FilmDetails.vue")},
+            {path: 'play', component: () => import("../views/index/Play.vue")},
+            {path: 'search', component: () => import("../views/index/SearchFilm.vue")},
+            {path: 'filmClassify', component: () => import("../views/index/FilmClassify.vue")},
+            {path: 'filmClassifySearch', component: () => import("../views/index/FilmClassifySearch.vue")},
+            {path: '/custom/player', component: () => import("../views/index/CustomPlay.vue")},
+            {path: '/history', component: () => import("../views/index/FilmHistory.vue")},
         ]
     },
-    {path: '/login', component: Login},
+    {path: '/login', component: () => import("../views/Login.vue")},
     {
         path: '/manage',
-        component: ManageHome,
+        component: () => import("../views/manage/ManageHome.vue"),
         redirect: '/manage/index',
         children: [
-            {path: 'index', component: ManageIndex},
-            {path: 'collect/index', component: CollectManage},
-            {path: 'collect/record', component: FailureRecord},
-            {path: 'system/webSite', component: SiteConfig},
-            {path: 'system/banners', component: Banners},
-            {path: 'cron/index', component: CronManage},
-            {path: 'file/upload', component: FileUpload},
-            {path: 'file/gallery', component: Temp},
-            {path: 'film', component: Film},
-            {path: 'film/class', component: FilmClass},
-            {path: 'film/add', component: FilmAdd},
-            {path: 'film/detail', component: Temp},
+            {path: 'index', component: () => import("../views/manage/Index.vue")},
+            {path: 'collect/index', component: () => import("../views/manage/collect/CollectManage.vue")},
+            {path: 'collect/record', component: () => import("../views/manage/collect/FailureRecord.vue")},
+            {path: 'system/webSite', component: () => import("../views/manage/system/SiteConfig.vue")},
+            {path: 'system/banners', component: () => import("../views/manage/system/Banners.vue")},
+            {path: 'cron/index', component: () => import("../views/manage/cron/CronManage.vue")},
+            {path: 'file/upload', component: () => import("../views/manage/file/FileUpload.vue")},
+            {path: 'file/gallery', component: () => import("../views/manage/file/Temp.vue")},
+            {path: 'film', component: () => import("../views/manage/film/Film.vue")},
+            {path: 'film/class', component: () => import("../views/manage/film/FilmClass.vue")},
+            {path: 'film/add', component: () => import("../views/manage/film/FilmAdd.vue")},
+            {path: 'film/detail', component: () => import("../views/manage/file/Temp.vue")},
 
         ]
     },
-    {path: `/:pathMatch(.*)*`, component: NotFound},
+    {path: `/:pathMatch(.*)*`, component: () => import('../views/error/Error404.vue')},
 ]
 
 // 创建路由实例并传递 routes配置

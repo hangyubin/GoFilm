@@ -12,6 +12,8 @@ func SetupRouter() *gin.Engine {
 	r := gin.Default()
 	// 开启跨域
 	r.Use(middleware.Cors())
+	// 全局错误处理
+	r.Use(middleware.ErrorHandler())
 
 	// 静态资源配置
 	r.Static(config.FilmPictureUrlPath, config.FilmPictureUploadDir)

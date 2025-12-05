@@ -21,22 +21,22 @@ import (
 type SearchInfo struct {
 	gorm.Model
 	Mid          int64   `json:"mid"`          //影片ID gorm:"uniqueIndex:idx_mid"
-	Cid          int64   `json:"cid"`          //分类ID
-	Pid          int64   `json:"pid"`          //上级分类ID
-	Name         string  `json:"name"`         // 片名
-	SubTitle     string  `json:"subTitle"`     // 影片子标题
+	Cid          int64   `json:"cid"`          //分类ID gorm:"index:idx_cid"
+	Pid          int64   `json:"pid"`          //上级分类ID gorm:"index:idx_pid"
+	Name         string  `json:"name"`         // 片名 gorm:"index:idx_name,type:gin"`
+	SubTitle     string  `json:"subTitle"`     // 影片子标题 gorm:"index:idx_subtitle,type:gin"`
 	CName        string  `json:"cName"`        // 分类名称
-	ClassTag     string  `json:"classTag"`     //类型标签
-	Area         string  `json:"area"`         // 地区
-	Language     string  `json:"language"`     // 语言
-	Year         int64   `json:"year"`         // 年份
-	Initial      string  `json:"initial"`      // 首字母
-	Score        float64 `json:"score"`        //评分
-	UpdateStamp  int64   `json:"updateStamp"`  // 更新时间
-	Hits         int64   `json:"hits"`         // 热度排行
-	State        string  `json:"state"`        //状态 正片|预告
+	ClassTag     string  `json:"classTag"`     //类型标签 gorm:"index:idx_classtag,type:gin"`
+	Area         string  `json:"area"`         // 地区 gorm:"index:idx_area"
+	Language     string  `json:"language"`     // 语言 gorm:"index:idx_language"
+	Year         int64   `json:"year"`         // 年份 gorm:"index:idx_year"
+	Initial      string  `json:"initial"`      // 首字母 gorm:"index:idx_initial"
+	Score        float64 `json:"score"`        //评分 gorm:"index:idx_score"
+	UpdateStamp  int64   `json:"updateStamp"`  // 更新时间 gorm:"index:idx_updatestamp"
+	Hits         int64   `json:"hits"`         // 热度排行 gorm:"index:idx_hits"
+	State        string  `json:"state"`        //状态 正片|预告 gorm:"index:idx_state"
 	Remarks      string  `json:"remarks"`      // 完结 | 更新至x集
-	ReleaseStamp int64   `json:"releaseStamp"` //上映时间 时间戳
+	ReleaseStamp int64   `json:"releaseStamp"` //上映时间 时间戳 gorm:"index:idx_releasestamp"
 }
 
 // Tag 影片分类标签结构体
@@ -476,12 +476,15 @@ func SearchFilmKeyword(keyword string, page *Page) []SearchInfo {
 	var searchList []SearchInfo
 	// 1. 先统计搜索满足条件的数据量
 	var count int64
-	db.Mdb.Model(&SearchInfo{}).Where("name LIKE ?", fmt.Sprint(`%`, keyword, `%`)).Or("sub_title LIKE ?", fmt.Sprint(`%`, keyword, `%`)).Count(&count)
+	
+	// 使用PostgreSQL全文搜索
+	fullTextQuery := fmt.Sprintf("to_tsvector('simple', name || ' ' || sub_title) @@ plainto_tsquery('simple', '%s')", keyword)
+	db.Mdb.Model(&SearchInfo{}).Where(fullTextQuery).Count(&count)
 	page.Total = int(count)
 	page.PageCount = int((page.Total + page.PageSize - 1) / page.PageSize)
 	// 2. 获取满足条件的数据
 	db.Mdb.Limit(page.PageSize).Offset((page.Current-1)*page.PageSize).
-		Where("name LIKE ?", fmt.Sprintf(`%%%s%%`, keyword)).Or("sub_title LIKE ?", fmt.Sprintf(`%%%s%%`, keyword)).Order("year DESC, update_stamp DESC").Find(&searchList)
+		Where(fullTextQuery).Order("year DESC, update_stamp DESC").Find(&searchList)
 	return searchList
 }
 

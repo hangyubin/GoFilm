@@ -6,23 +6,36 @@ import (
 	"server/model/system"
 	"server/plugin/SystemInit"
 	"server/plugin/db"
+	"server/plugin/log"
 	"server/router"
 	"time"
 )
 
+var cfg = config.LoadConfig()
+
 func init() {
+	// 初始化日志系统
+	err := log.InitLogger(log.INFO, "./logs/app.log")
+	if err != nil {
+		panic(fmt.Sprintf("Failed to initialize logger: %v", err))
+	}
+	log.Info("Logger initialized successfully")
+
 	// 执行初始化前等待20s , 让mysql服务完成初始化指令
-	time.Sleep(time.Second * 20)
+	time.Sleep(time.Second * 10)
+	log.Info("Starting database connections...")
 	//初始化redis客户端
-	err := db.InitRedisConn()
+	err = db.InitRedisConn()
 	if err != nil {
-		panic(err)
+		log.Fatal(fmt.Sprintf("Failed to initialize Redis: %v", err))
 	}
-	// 初始化mysql
-	err = db.InitMysql()
+	log.Info("Redis initialized successfully")
+	// 初始化数据库
+	err = db.InitDatabase()
 	if err != nil {
-		panic(err)
+		log.Fatal(fmt.Sprintf("Failed to initialize database: %v", err))
 	}
+	log.Info("Database initialized successfully")
 }
 
 func main() {
@@ -34,7 +47,7 @@ func start() {
 	DefaultDataInit()
 	// 开启路由监听
 	r := router.SetupRouter()
-	_ = r.Run(fmt.Sprintf(":%s", config.ListenerPort))
+	_ = r.Run(fmt.Sprintf(":%s", cfg.Server.Port))
 }
 
 func DefaultDataInit() {
